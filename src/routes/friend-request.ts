@@ -15,6 +15,8 @@ export function initRequestRoutes(app: Express) {
 
     app.get("/api/auth/viewAllSentRequestsByClient", Authentication.clientVerification, FriendRequestEp.viewAllSentRequestsByClient);
 
+    app.get("/api/auth/chatList", Authentication.THERAPISTAndClientVerification, FriendRequestEp.viewAllChatList);
+
     app.post("/api/auth/removeFriendRequest/:requestId", Authentication.THERAPISTAndClientVerification, FriendRequestEp.removeFriendRequest);
 
     app.post("/api/auth/unfriendUser/:requestId", Authentication.THERAPISTAndClientVerification, FriendRequestEp.unfriendUser);

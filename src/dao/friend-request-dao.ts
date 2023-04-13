@@ -235,6 +235,7 @@ export namespace FriendRequestDao {
     return response;
   }
 
+
   export async function deleteRequestById(
     id: StringOrObjectId
   ): Promise<IFriendRequest> {
@@ -296,5 +297,133 @@ export namespace FriendRequestDao {
       therapistId: therapistId,
     });
     return response;
+  }
+
+  export async function getAllApprovedByTherapistId(
+    therapistId: Types.ObjectId,
+
+  ): Promise<IFriendRequest[]> {
+    // const response = await FriendRequest.find({
+    //   therapistId: therapistId,
+    // }).where("status").ne(FriendRequestStatus.REJECTED).populate(populateOptions);
+
+    const res = await FriendRequest.aggregate([
+      {
+        $match: {
+          $and: [
+            { therapistId: therapistId },
+            { status:  FriendRequestStatus.APPROVED },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "clientId",
+          foreignField: "_id",
+          as: "clientId",
+        },
+      },
+      {
+        $unwind: {
+          path: "$clientId",
+        },
+      },
+      {
+        $match: {
+          $or: [
+            { "clientId.blockedByAdmin": false },
+            { "clientId.blockedByAdmin": undefined },
+          ],
+        },
+      },
+    ])
+
+
+    const response = FriendRequest.populate(res, populateOptions);
+
+    return response;
+  }
+
+  export async function getAllApprovdByClient(
+    clientId: Types.ObjectId,
+  ): Promise<IFriendRequest[]> {
+    const res = await FriendRequest.aggregate([
+      {
+        $match: {
+          $and: [
+            { clientId: clientId },
+            { status: FriendRequestStatus.APPROVED },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "therapistId",
+          foreignField: "_id",
+          pipeline: [
+            {
+              $project: {
+                experiencedIn: 1,
+                photoId: 1,
+                adminApproved: 1,
+                blockedByAdmin: 1,
+                firstname: 1,
+                lastname: 1,
+                role: 1,
+              },
+            },
+          ],
+          as: "therapistId",
+        },
+      },
+      {
+        $unwind: {
+          path: "$therapistId",
+        },
+      },
+      {
+        $match: {
+          $or: [
+            { "therapistId.blockedByAdmin": false },
+            { "therapistId.blockedByAdmin": undefined },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: "experiencetags",
+          localField: "therapistId.experiencedIn",
+          foreignField: "_id",
+          pipeline: [
+            {
+              $project: { experienceTag: 1 },
+            },
+          ],
+          as: "therapistId.experiencedIn",
+        },
+      },
+      {
+        $lookup: {
+          from: "uploads",
+          localField: "therapistId.photoId",
+          foreignField: "_id",
+          as: "therapistId.photoId",
+        },
+      },
+      {
+        $unwind: {
+          path: "$therapistId.photoId",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $sample: { size: 99 },
+      },
+    ])
+      .sort({ createdAt: -1 })
+
+    return res;
   }
 }
