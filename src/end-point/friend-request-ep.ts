@@ -435,8 +435,10 @@ export namespace FriendRequestEp {
   export async function viewAllChatList(req: Request, res: Response, next: NextFunction) {
     const clientId = req.user._id;
     const role = req.user.role;
-
+ console.log(role);
+ 
     if (role === UserRole.CLIENT) {
+
       try {
         let chatList = await FriendRequestDao.getAllApprovdByClient(clientId);
 
@@ -444,16 +446,13 @@ export namespace FriendRequestEp {
       } catch (error) {
         return res.sendError(error);
       }
-    } if (role === UserRole.THERAPIST) {
+    } else 
       try {
         let chatList = await FriendRequestDao.getAllApprovedByTherapistId(clientId);
-
         return res.sendSuccess(chatList, "Success");
       } catch (error) {
         return res.sendError(error);
       }
-    }else {
-      return res.sendError("Invalid user role.");
-    }
+    
   }
 }

@@ -321,12 +321,12 @@ export namespace FriendRequestDao {
           from: "users",
           localField: "clientId",
           foreignField: "_id",
-          as: "clientId",
+          as: "therapistId",
         },
       },
       {
         $unwind: {
-          path: "$clientId",
+          path: "$therapistId",
         },
       },
       {
@@ -418,6 +418,7 @@ export namespace FriendRequestDao {
           preserveNullAndEmptyArrays: true,
         },
       },
+
       {
         $sample: { size: 99 },
       },
