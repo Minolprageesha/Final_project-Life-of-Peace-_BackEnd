@@ -222,8 +222,8 @@ export namespace UserDao {
         role: role,
         roleType: roleType,
         photoId: null,
-        verifiedStatus: verifiedStatus ? verifiedStatus : UserStatus.PENDING,
-        adminApproved: false,
+        verifiedStatus: verifiedStatus ? verifiedStatus : UserStatus.VERIFIED,
+        adminApproved: true,
         blockedByAdmin: false,
       };
     }
@@ -235,7 +235,7 @@ export namespace UserDao {
         password: password,
         role: role,
         photoId: null,
-        verifiedStatus: verifiedStatus ? verifiedStatus : UserStatus.PENDING,
+        verifiedStatus: verifiedStatus ? verifiedStatus : UserStatus.VERIFIED,
         adminApproved: true,
         blockedByAdmin: false,
       };
@@ -280,7 +280,7 @@ export namespace UserDao {
         gender: gender,
         dateOfBirth: dateOfBirth,
         photoId: null,
-        verifiedStatus: verifiedStatus ? verifiedStatus : UserStatus.PENDING,
+        verifiedStatus: verifiedStatus ? verifiedStatus : UserStatus.VERIFIED,
         adminApproved: true,
         blockedByAdmin: false,
       };

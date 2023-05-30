@@ -237,7 +237,7 @@ export namespace UserEp {
 
         return res.sendSuccess(user, "THERAPIST Registered.");
       } else {
-        user = await UserDao.signUpWithUsers(email, primaryPhone, password, role, UserStatus.PENDING);
+        user = await UserDao.signUpWithUsers(email, primaryPhone, password, role, UserStatus.VERIFIED);
         console.log(user)
         let code = Math.floor(Math.random() * (999999 - 100000 + 1) + 100000);
 
@@ -257,26 +257,7 @@ export namespace UserEp {
           return res.sendError(error);
         }
 
-        let isEmailSent = await EmailService.sendVerifyEmail(
-          user,
-          "Life of Pease - Verify your email.",
-          verificationCode,
-          "Thank you for signing up with Life of Pease  !",
-          "To proceed with your account you have to verify your email. Please enter the following OTP in the verify section."
-        );
-
-        console.log(isEmailSent)
-
-
-        if (!user) {
-          return res.sendError("User signup failed! Please try again later.");
-        }
-
-        if (isEmailSent) {
-          return res.sendSuccess(user, "Success");
-        } else {
-          return res.sendError("Email not sent.");
-        }
+        return res.sendSuccess(user, "Success");
       }
     } catch (error) {
       return res.sendError(error);
